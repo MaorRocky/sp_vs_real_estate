@@ -8,6 +8,8 @@ import calculateRealEstateProfit from "@/actions/calculateRealEstateProfit";
 import calculateSp500FutureValue from "@/actions/calculateSp500FutureValue";
 import {formatSiUnit} from "format-si-unit";
 import {Label} from "@/components/ui/label";
+import {MathJax, MathJaxContext} from "better-react-mathjax";
+
 
 const InvestmentComparison = () => {
     const [initialInvestment, setInitialInvestment] = useState(1500000);
@@ -45,127 +47,135 @@ const InvestmentComparison = () => {
         setResults({realEstateResult, sp500Result});
     };
     const calculateMonthlyPaymentFormula = () => {
-        const P = mortgageAmount;
+        const P = mortgageAmount.toLocaleString("en-US");
         const r = mortgageInterestRate / 12;
         const n = years * 12;
 
-        return `M = ${P} × [(${r.toFixed(5)}) × (1 + ${r.toFixed(5)})^${n}] / [(1 + ${r.toFixed(5)})^${n} - 1]`;
+        return `\\[ M = ${P} \\times \\frac{(${r.toFixed(5)}) \\times (1 + ${r.toFixed(5)})^{${n}}}{(1 + ${r.toFixed(5)})^{${n}} - 1} \\]`;
     };
+
+    const mortgageFormula = `
+  \\[
+  M = P \\times \\frac{r \\times (1 + r)^n}{(1 + r)^n - 1}
+  \\]
+`;
+
+
     return (
         <div className="w-full h-full flex flex-col items-center gap-2">
             <h1 className="text-3xl font-bold text-center">Investment Comparison</h1>
 
             <Card className="w-full p-4 m-2">
-            <form onSubmit={handleSubmit} className="space-y-4 w-full mt-2">
-                {/* Form Group */}
-                <div className="grid grid-cols-1 gap-4">
-                    <div>
-                        <Label>Initial Investment</Label>
-                        <Input
-                            type="number"
-                            value={initialInvestment}
-                            onChange={(e) => setInitialInvestment(Number(e.target.value))}
-                            placeholder="Enter initial investment amount"
-                        />
+                <form onSubmit={handleSubmit} className="space-y-4 w-full mt-2">
+                    {/* Form Group */}
+                    <div className="grid grid-cols-1 gap-4">
+                        <div>
+                            <Label>Initial Investment</Label>
+                            <Input
+                                type="number"
+                                value={initialInvestment}
+                                onChange={(e) => setInitialInvestment(Number(e.target.value))}
+                                placeholder="Enter initial investment amount"
+                            />
+                        </div>
+
+                        <div>
+                            <Label>Mortgage Amount</Label>
+                            <Input
+                                type="number"
+                                value={mortgageAmount}
+                                onChange={(e) => setMortgageAmount(Number(e.target.value))}
+                                placeholder="Enter mortgage amount"
+                            />
+                        </div>
+
+                        <div>
+                            <Label>Mortgage Interest Rate (%)</Label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                value={(mortgageInterestRate * 100).toFixed(2)}
+                                onChange={(e) => setMortgageInterestRate(Number(e.target.value) / 100)}
+                                placeholder="Enter mortgage interest rate"
+                            />
+                        </div>
+
+                        <div>
+                            <Label>Investment Period (Years)</Label>
+                            <Input
+                                type="number"
+                                value={years}
+                                onChange={(e) => setYears(Number(e.target.value))}
+                                placeholder="Enter investment period in years"
+                            />
+                        </div>
+
+                        <div>
+                            <Label>Annual Property Price Increase (%)</Label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                value={(priceIncreaseRate * 100).toFixed(2)}
+                                onChange={(e) => setPriceIncreaseRate(Number(e.target.value) / 100)}
+                                placeholder="Enter annual property price increase"
+                            />
+                        </div>
+
+                        <div>
+                            <Label>S&P 500 Annual Return Rate (%)</Label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                value={sp500AnnualReturnRate * 100}
+                                onChange={(e) => setSp500AnnualReturnRate(Number(e.target.value) / 100)}
+                                placeholder="Enter S&P 500 annual return rate"
+                            />
+                        </div>
+
+                        <div>
+                            <Label>Annual Inflation Rate (%)</Label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                value={inflationRate * 100}
+                                onChange={(e) => setInflationRate(Number(e.target.value) / 100)}
+                                placeholder="Enter annual inflation rate"
+                            />
+                        </div>
+
+
+                        <div>
+                            <Label>Tax Rate (%)</Label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                value={taxRate * 100}
+                                onChange={(e) => setTaxRate(Number(e.target.value) / 100)}
+                                placeholder="Enter tax rate"
+                            />
+                        </div>
+
+
+                        <div>
+                            <Label>Monthly addition</Label>
+                            <Input
+                                type="number"
+                                step="100"
+                                value={monthlyDeposit}
+                                onChange={(e) => setMonthlyDeposit(Number(e.target.value))}
+                                placeholder="Enter monthly deposit amount"
+                            />
+                        </div>
+
                     </div>
 
-                    <div>
-                        <Label>Mortgage Amount</Label>
-                        <Input
-                            type="number"
-                            value={mortgageAmount}
-                            onChange={(e) => setMortgageAmount(Number(e.target.value))}
-                            placeholder="Enter mortgage amount"
-                        />
+                    {/* Submit Button */}
+                    <div className="flex justify-end">
+                        <Button type="submit" className="w-full bg-blue-600 text-white hover:bg-blue-700">
+                            Calculate
+                        </Button>
                     </div>
-
-                    <div>
-                        <Label>Mortgage Interest Rate (%)</Label>
-                        <Input
-                            type="number"
-                            step="0.01"
-                            value={(mortgageInterestRate * 100).toFixed(2)}
-                            onChange={(e) => setMortgageInterestRate(Number(e.target.value) / 100)}
-                            placeholder="Enter mortgage interest rate"
-                        />
-                    </div>
-
-                    <div>
-                        <Label>Investment Period (Years)</Label>
-                        <Input
-                            type="number"
-                            value={years}
-                            onChange={(e) => setYears(Number(e.target.value))}
-                            placeholder="Enter investment period in years"
-                        />
-                    </div>
-
-                    <div>
-                        <Label>Annual Property Price Increase (%)</Label>
-                        <Input
-                            type="number"
-                            step="0.01"
-                            value={(priceIncreaseRate * 100).toFixed(2)}
-                            onChange={(e) => setPriceIncreaseRate(Number(e.target.value) / 100)}
-                            placeholder="Enter annual property price increase"
-                        />
-                    </div>
-
-                    <div>
-                        <Label>S&P 500 Annual Return Rate (%)</Label>
-                        <Input
-                            type="number"
-                            step="0.01"
-                            value={sp500AnnualReturnRate * 100}
-                            onChange={(e) => setSp500AnnualReturnRate(Number(e.target.value) / 100)}
-                            placeholder="Enter S&P 500 annual return rate"
-                        />
-                    </div>
-
-                    <div>
-                        <Label>Annual Inflation Rate (%)</Label>
-                        <Input
-                            type="number"
-                            step="0.01"
-                            value={inflationRate * 100}
-                            onChange={(e) => setInflationRate(Number(e.target.value) / 100)}
-                            placeholder="Enter annual inflation rate"
-                        />
-                    </div>
-
-
-                    <div>
-                        <Label>Tax Rate (%)</Label>
-                        <Input
-                            type="number"
-                            step="0.01"
-                            value={taxRate * 100}
-                            onChange={(e) => setTaxRate(Number(e.target.value) / 100)}
-                            placeholder="Enter tax rate"
-                        />
-                    </div>
-
-
-                    <div>
-                        <Label>Monthly addition</Label>
-                        <Input
-                            type="number"
-                            step="100"
-                            value={monthlyDeposit}
-                            onChange={(e) => setMonthlyDeposit(Number(e.target.value))}
-                            placeholder="Enter monthly deposit amount"
-                        />
-                    </div>
-
-                </div>
-
-                {/* Submit Button */}
-                <div className="flex justify-end">
-                    <Button type="submit" className="w-full bg-blue-600 text-white hover:bg-blue-700">
-                        Calculate
-                    </Button>
-                </div>
-            </form>
+                </form>
             </Card>
 
             <Card className="w-full">
@@ -174,7 +184,9 @@ const InvestmentComparison = () => {
                 </CardHeader>
                 <CardContent>
                     <p className="text-gray-700">
-                        M = P × [ (r × (1 + r)<sup>n</sup>) / ((1 + r)<sup>n</sup> - 1) ]
+                        <MathJaxContext>
+                            <MathJax>{mortgageFormula}</MathJax>
+                        </MathJaxContext>
                     </p>
                     <p className="mt-4">
                         <strong>Where:</strong>
@@ -194,7 +206,10 @@ const InvestmentComparison = () => {
                     <p className="mt-6">
                         <strong>Final Formula with Variables:</strong>
                     </p>
-                    <p className="text-blue-600 text-lg">{calculateMonthlyPaymentFormula()}</p>
+                    <MathJaxContext>
+                        <MathJax>{calculateMonthlyPaymentFormula()}</MathJax>
+                    </MathJaxContext>
+
                 </CardContent>
             </Card>
 
