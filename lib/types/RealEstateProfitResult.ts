@@ -8,5 +8,6 @@
 export interface Sp500FutureValueResult {
     nominalFutureValue: number;
     realFutureValue: number;
+    afterTaxFutureValue: number;
 }
  

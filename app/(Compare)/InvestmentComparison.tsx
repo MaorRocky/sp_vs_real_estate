@@ -17,6 +17,8 @@ const InvestmentComparison = () => {
     const [priceIncreaseRate, setPriceIncreaseRate] = useState(0.035);
     const [sp500AnnualReturnRate, setSp500AnnualReturnRate] = useState(0.1);
     const [inflationRate, setInflationRate] = useState(0.03);
+    const [monthlyDeposit, setMonthlyDeposit] = useState(0);
+    const [taxRate, setTaxRate] = useState(0.25);
     const [results, setResults] = useState(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -35,7 +37,9 @@ const InvestmentComparison = () => {
             initialInvestment,
             sp500AnnualReturnRate,
             years,
-            inflationRate
+            inflationRate,
+            monthlyDeposit,
+            taxRate
         );
 
         setResults({realEstateResult, sp500Result});
@@ -51,6 +55,7 @@ const InvestmentComparison = () => {
         <div className="w-full h-full flex flex-col items-center gap-2">
             <h1 className="text-3xl font-bold text-center">Investment Comparison</h1>
 
+            <Card className="w-full p-4 m-2">
             <form onSubmit={handleSubmit} className="space-y-4 w-full mt-2">
                 {/* Form Group */}
                 <div className="grid grid-cols-1 gap-4">
@@ -79,7 +84,7 @@ const InvestmentComparison = () => {
                         <Input
                             type="number"
                             step="0.01"
-                            value={mortgageInterestRate * 100}
+                            value={(mortgageInterestRate * 100).toFixed(2)}
                             onChange={(e) => setMortgageInterestRate(Number(e.target.value) / 100)}
                             placeholder="Enter mortgage interest rate"
                         />
@@ -100,7 +105,7 @@ const InvestmentComparison = () => {
                         <Input
                             type="number"
                             step="0.01"
-                            value={priceIncreaseRate * 100}
+                            value={(priceIncreaseRate * 100).toFixed(2)}
                             onChange={(e) => setPriceIncreaseRate(Number(e.target.value) / 100)}
                             placeholder="Enter annual property price increase"
                         />
@@ -127,6 +132,31 @@ const InvestmentComparison = () => {
                             placeholder="Enter annual inflation rate"
                         />
                     </div>
+
+
+                    <div>
+                        <Label>Tax Rate (%)</Label>
+                        <Input
+                            type="number"
+                            step="0.01"
+                            value={taxRate * 100}
+                            onChange={(e) => setTaxRate(Number(e.target.value) / 100)}
+                            placeholder="Enter tax rate"
+                        />
+                    </div>
+
+
+                    <div>
+                        <Label>Monthly addition</Label>
+                        <Input
+                            type="number"
+                            step="100"
+                            value={monthlyDeposit}
+                            onChange={(e) => setMonthlyDeposit(Number(e.target.value))}
+                            placeholder="Enter monthly deposit amount"
+                        />
+                    </div>
+
                 </div>
 
                 {/* Submit Button */}
@@ -136,6 +166,7 @@ const InvestmentComparison = () => {
                     </Button>
                 </div>
             </form>
+            </Card>
 
             <Card className="w-full">
                 <CardHeader>
@@ -172,7 +203,8 @@ const InvestmentComparison = () => {
                 <div className=" w-full pb-8 ">
                     <Card className="mt-4">
                         <CardHeader>
-                            <CardTitle className="text-lg font-semibold">Real Estate Investment Results</CardTitle>
+                            <CardTitle className="text-center text-lg font-semibold">Real Estate Investment
+                                Results</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
                             <p>
@@ -194,7 +226,8 @@ const InvestmentComparison = () => {
 
                     <Card className="mt-4">
                         <CardHeader>
-                            <CardTitle className="text-lg font-semibold">S&P 500 Investment Results</CardTitle>
+                            <CardTitle className="text-center text-lg font-semibold">S&P 500 Investment
+                                Results</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
                             <p>
@@ -206,6 +239,10 @@ const InvestmentComparison = () => {
                                 <strong>Real Future Profit after
                                     Inflation:</strong> {formatSiUnit(results.sp500Result.realFutureValue)} currency
                                 units
+                            </p>
+                            <p>
+                                <strong>After
+                                    taxes</strong> {formatSiUnit(results.sp500Result.afterTaxFutureValue)} currency
                             </p>
                         </CardContent>
                     </Card>
